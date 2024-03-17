@@ -30,7 +30,7 @@ export default function CartModal(props: any) {
         }}
       >
         <ModalContent className="h-full align-end !mx-0 rounded-r-none">
-          <ModalHeader className="flex flex-col gap-1">Log in</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">Cart</ModalHeader>
           <ModalBody>
             {!cart || cart?.cart_items?.length === 0 ? (
               <div className="mt-20 flex w-full flex-col items-center justify-center overflow-hidden">
