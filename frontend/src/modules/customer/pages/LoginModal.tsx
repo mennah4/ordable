@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link } from "@nextui-org/react";
 import { MailIcon } from "../../../components/icons/MailIcon";
 import { LockIcon } from "../../../components/icons/LockIcon";
-import { loginUser } from "../actions/userActions";
+import { loginUser, registerUser } from "../../user/userActions";
 
 export default function LoginModal(props: any) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -20,14 +20,20 @@ export default function LoginModal(props: any) {
                             <ModalHeader className="flex flex-col gap-1">Log in</ModalHeader>
                             <ModalBody>
                                 <form onSubmit={(e: any) => {
-                                    console.log(e)
-                                    loginUser(e);
+                                    if (props.mode === 'login') {
+                                        loginUser(e);
+                                    } else {    
+                                        registerUser(e);
+                                    }
                                     onClose();
                                 }}>
 
-
+                                    {props.mode === 'signup' && (
+                                        <input type="hidden" name="roles" value="CUSTOMER" />
+                                    )}
                                     <Input
                                         autoFocus
+                                        className="mb-2"
                                         endContent={
                                             <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                                         }
@@ -35,29 +41,30 @@ export default function LoginModal(props: any) {
                                         placeholder="Enter your email"
                                         variant="bordered"
                                         name="email"
+                                        required
                                     />
                                     <Input
                                         endContent={
                                             <LockIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                                         }
+                                        className="mb-4"
                                         label="Password"
                                         placeholder="Enter your password"
                                         type="password"
                                         variant="bordered"
                                         name="password"
+                                        required
                                     />
-                                    <div>
+                                    <ModalFooter>
                                         <Button color="danger" variant="flat" onPress={onClose}>
                                             close
                                         </Button>
                                         <Button color="primary" type="submit">
                                             {props.mode}
                                         </Button>
-                                    </div>
+                                    </ModalFooter>
                                 </form>
                             </ModalBody>
-
-
                         </>
                     )}
                 </ModalContent>

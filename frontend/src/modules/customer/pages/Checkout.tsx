@@ -8,95 +8,73 @@ import { CUSTOMER_STORE_NAME } from '../../../redux/constants';
 import { useAppSelector } from '../../../redux';
 import MasterCardIcon from '../../../components/icons/MasterCardIcon';
 import { createOrder } from '../actions/orderActions';
+import { calculateTotalCartAmount, randomId } from '../../../utils';
+import CartItem from './CartItem';
 
 const options = [
     { label: 'Visa', type: 'online',  value: <VisaIcon /> },
     { label: 'Apple pay', type: 'online', value: <ApplePayIcon /> },
-    { label: 'Cash', type: 'cash', value: <CashIcon /> },
+    { label: 'Cash', type: 'oash', value: <CashIcon /> },
     { label: 'Master Cart', type: 'online', value: <MasterCardIcon /> },
 ];
 
-const CheckoutPage = () => {
+const SHIPPING_FEE = 5;
 
-    const [totalAmount, setTotalAmount] = useState(0);
-    const SHIPPING_FEES = 3;
+const CheckoutPage = () => {
+    const cart = useAppSelector((state) => state[CUSTOMER_STORE_NAME].cart);
+    const [addres, setAddress] = useState('Kuwait city');
+    const [paymentType, setPaymentType] = useState<{ label: string; type: string; value: JSX.Element }>();
+
     useEffect(() => {
         getCustomerCart()
     }, []);
 
-    const cart = useAppSelector((state) => state[CUSTOMER_STORE_NAME].cart);
 
-    useEffect(() => {
-        const total = cart?.cart_items.reduce((accumulator: any, currentItem: any) => {
-            const price = currentItem.product__price;
-            const quantity = currentItem.quantity;
-            return accumulator + (price * quantity);
-          }, 0);
-          setTotalAmount(total + SHIPPING_FEES)
-    },[cart])
 
     return (
-        <div className="flex flex-1">
+        <div className="max-w-screen-lg mx-auto flex flex-1">
             <div className="w-1/2 border-r border-gray-200">
                 <div className="p-4">
                     <h2 className="font-medium text-lg mb-4">Cart Details</h2>
-                    {cart?.cart_items?.map((item: any, i: number) => (
-                        <div className="flex items-center mb-2">
-                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <img src="..." alt="..." className="w-full h-full rounded-full" />
-                            </div>
-                            <div className="flex-grow ml-4">
-                                <p className="font-medium">{item?.product__name}</p>
-                                <p className="text-gray-500 text-sm">{item?.product__price} *  {item?.quantity}</p>
-                            </div>
-                        </div>
+                    {cart?.cart_items && cart?.cart_items?.map((item: any, i: number) => (
+                        <CartItem item={item}/>
+
                     ))}
-                    <div className="border-t border-neutral-200 flex items-center justify-between mb-6">
+                    <div className="border-t pt-4 border-neutral-200 flex items-center justify-between mb-6">
                         <p className="text-gray-500 text-sm">Subtotal</p>
-                        <p className="font-medium text-sm">$15.00</p>
+                        <p className="font-medium text-sm">{calculateTotalCartAmount(cart?.cart_items ?? [])} KD</p>
                     </div>
                     <div className="flex items-center justify-between mb-6">
                         <p className="text-gray-500 text-sm">Shipping</p>
-                        <p className="font-medium text-sm">USD $3.00</p>
+                        <p className="font-medium text-sm">{SHIPPING_FEE} KD</p>
                     </div>
                     <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-sm">Total</p>
-                        <p className="font-medium text-sm">USD ${totalAmount}</p>
+                        <p className="font-medium text-sm">{calculateTotalCartAmount(cart?.cart_items ?? []) + SHIPPING_FEE} KD</p>
                     </div>
                 </div>
             </div>
             <div className="w-1/2 p-4">
-                <h2 className="font-medium text-lg mb-4">Shipping & Payment</h2>
-                <div className='flex justify-around gap-3'>
-                    <button className="w-full py-2 rounded-md ">
-                        <div className='p-4 border-2 border-neutral-300 rounded-lg'>
-                            Pickup
-                        </div>
-                    </button>
-                    <button className="w-full py-2 rounded-md ">
-                        <div className='border-2 p-4 border-neutral-300 rounded-lg'>
-                            Delivery
-                        </div>
-                    </button>
-                </div>
-                <div className="my-4">
-                    <h6 className="font-medium text-lg mb-4">Delivery address</h6>
-                    <Input
-                        autoFocus
-                        name="name"
-                        label="Address"
-                        isRequired
-                        placeholder="Delivery Address"
-                        variant="bordered"
-                        defaultValue="Kuwait city"
-                    />
-                </div>
+                <h6 className="font-medium text-lg mb-4 border-b pb-4">Delivery address</h6>
+                <Input
+                    autoFocus
+                    name="name"
+                    label="Address"
+                    isRequired
+                    placeholder="Delivery Address"
+                    variant="bordered"
+                    defaultValue="Kuwait city"
+                    onChange={(e) => setAddress(e.target.value)}
+                />
 
-                <div className="mb-4">
+                <div className="my-4">
                     <label className="block text-sm font-medium mb-2">Payment Type</label>
                     <div className="flex justify-around gap-3 items-center">
                         {options.map((option) => (
-                            <button className="px-3 py-2 rounded-md focus:outline-none focus:ring focus:ring-gray-300">
+                            <button
+                                className="px-3 py-2 rounded-md focus:outline-none focus:ring focus:ring-gray-300"
+                                onClick={() => setPaymentType(option)}
+                            >
                                 <div className='px-4 border-2  border-neutral-200 rounded-lg'>
                                     {option.value}
                                 </div>
@@ -105,7 +83,16 @@ const CheckoutPage = () => {
                     </div>
                 </div>
                 <button
-                  onClick={createOrder}
+                  onClick={() => createOrder({
+                    order_no: randomId(),
+                    products: cart?.cart_items.map((item: any) => (item.product.id)) ?? [],
+                    customer: cart?.customer_id,
+                    store: cart?.store_id,
+                    order_amount: calculateTotalCartAmount(cart?.cart_items ?? []),
+                    created_at: new Date().toISOString(),
+                    delivery_address: addres,
+                    payment_type: paymentType?.type ?? 'cash'
+                  })}
                   className="block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100"
                 >
                   Place order

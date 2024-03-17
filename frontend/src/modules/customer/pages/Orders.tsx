@@ -11,7 +11,6 @@ export default function CustomerOrders() {
     }, []); 
     const orders = useAppSelector((state) => state[CUSTOMER_STORE_NAME].orders);
 
-    console.log(orders)
     const statusColorMap: Record<string, ChipProps["color"]> = {
         "pending": "warning",
         "processing": "primary",
@@ -20,6 +19,7 @@ export default function CustomerOrders() {
     };
 
     return (
+        <div className="max-w-screen-lg mx-auto p-4">
         <Table
             defaultSelectedKeys={["2"]}
             aria-label="Example static collection table"
@@ -48,5 +48,6 @@ export default function CustomerOrders() {
                 ))}
             </TableBody>
         </Table>
+        </div>
     );
 }
