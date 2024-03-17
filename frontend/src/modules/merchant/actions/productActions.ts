@@ -113,7 +113,11 @@ export const deleteProduct = async (productId: number)  => {
     try {
         const url = getBaseUrl() + `product/delete/${productId}`;
         const response = await fetch(url, {
+            mode: 'no-cors',
             method: 'DELETE',
+            headers: {
+                "Content-Type": "application/json"
+           },
         });
         store.dispatch(merchanStore.deleteProdut(productId));
         alert('Product deleted successfully')
