@@ -5,7 +5,9 @@ import { MERCHANT_STORE_NAME } from "../../../redux/constants";
 
 export const fetchStoreOrders = async () => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/order/store/list/?store=${"8e471a55-d20e-439b-a9af-301b33ded43f"}`);
+        const storeInfo = store.getState()[MERCHANT_STORE_NAME].storeInfo ?? JSON.parse(localStorage.getItem('storeInfo') ?? '') ;
+
+        const response = await fetch(`http://127.0.0.1:8000/order/store/list/?store=${storeInfo?.id}`);
         const data = await response.json();
         store.dispatch(merchanStore.getStoreOrders(data));
         return data;

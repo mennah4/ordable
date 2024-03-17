@@ -4,22 +4,23 @@ import { MERCHANT_STORE_NAME } from "../../../redux/constants";
 import { createClient } from '@supabase/supabase-js'
 import { randomId } from "../../../utils";
 
-export const fetchStoreProducts = async (storeId: number) => {
+export const fetchStoreProducts = async () => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/product/store/list/?created_by=${1}`);
+        const merchantInfo = store.getState()[MERCHANT_STORE_NAME].merchantInfo ?? (localStorage.getItem('merchantInfo') && JSON.parse(localStorage.getItem('merchantInfo') ?? '')) ;
+
+        const createdBy = merchantInfo?.user_id ?? process.env.REACT_APP_MERCHANT_ID ?? ''
+        const response = await fetch(`http://127.0.0.1:8000/product/store/list/?created_by=${createdBy}`);
         const data = await response.json();
         store.dispatch(merchanStore.getStoreProducts(data));
-        return data;
     } catch (error) {
         console.log(error)
     }
 };
 
 export const createProduct = async (e: any) => {
-    console.log("Create new product")
     e.preventDefault()
     try {
-        const storeInfo = store.getState()[MERCHANT_STORE_NAME].storeInfo;
+        const merchantInfo = store.getState()[MERCHANT_STORE_NAME].merchantInfo ?? JSON.parse(localStorage.getItem('merchantInfo') ?? '') ;
         
         const formData = new FormData(e.target);
 
@@ -44,9 +45,8 @@ export const createProduct = async (e: any) => {
             description_ar: formData.get('description_ar') as string,
             price: formData.get('price') as unknown as number,
             stock: formData.get('stock') as unknown as number,
-            created_by: 1,
+            created_by: merchantInfo.user_id,
             images: files,
-            category: "7e01e96c-fa82-4850-8b20-7c6c3089627a"
         };
         const response = await fetch(`http://127.0.0.1:8000/product/create/`, {
             method: 'POST',
@@ -114,43 +114,5 @@ export const deleteProduct = async (productId: number)  => {
     } catch (error) {
         console.log(error)
         alert('Error deleting product');
-    }
-}
-
-export const fetchStoreCategories = async (storeId: number)  => {
-    try {
-        const response = await fetch(`/api/store/${storeId}/categories`);
-        const data = await response.json();
-        console.log(data)
-    } catch (error) {
-        console.log(error)
-    }
-};
-
-export const createCategory = (storeId: number, category: any) => async () => {
-    try {
-        const response = await fetch(`/api/store/${storeId}/categories`, {
-            method: 'POST',
-            body: JSON.stringify(category),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        const data = await response.json();
-        console.log(data)
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-export const deleteCategory = (storeId: number, categoryId: number) => async () => {
-    try {
-        const response = await fetch(`/api/store/${storeId}/categories/${categoryId}`, {
-            method: 'DELETE',
-        });
-        const data = await response.json();
-        console.log(data)
-    } catch (error) {
-        console.log(error)
     }
 }
