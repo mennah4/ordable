@@ -59,7 +59,7 @@ export const addToCart = async (productId: string, quantity: number) => {
             "product": productId,
             "quantity": quantity ?? 1
         }
-        const url = 'https://ordable-1.onrender.com/' + 'cart/add/'
+        const url = getBaseUrl() + 'cart/add/'
         const response = await fetch(url, {
             method: 'POST',
             headers: {
