@@ -2,6 +2,10 @@
 
 This is an e-commerce project built using React for the frontend and Django for the backend.
 
+## Demo
+
+Check the demo video: https://youtu.be/ar4tvtEPvwA
+
 ## Getting Started
 
 To get started with this project, follow these steps:
