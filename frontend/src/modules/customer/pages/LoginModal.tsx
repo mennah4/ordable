@@ -17,7 +17,7 @@ export default function LoginModal(props: any) {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Log in</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">{props.mode === 'login' ? "Log in" : "Sign up"}</ModalHeader>
                             <ModalBody>
                                 <form onSubmit={(e: any) => {
                                     if (props.mode === 'login') {
