@@ -49,7 +49,7 @@ const App = () => {
                     <NavBar />
 
                     <Routes>
-                      {['/products', '/', ''].map(path => <Route path="/products" element={<StoreFront/>} />) }
+                      {['/products', '/', ''].map(path => <Route path={path} element={<StoreFront/>} />) }
                       <Route path="/product/details" element={<ProductDetails />} />
                       <Route element={<ProtectedRoute />}>
                         <Route path='/customer/checkout' element={<CheckoutPage />} />
