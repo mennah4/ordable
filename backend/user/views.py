@@ -44,8 +44,12 @@ class CustomerRegistrationView(APIView):
                 'access': token,
                 'refresh': str(refresh),
                 'customer': {
-                    'id': user.id,
-                    'email': user.email
+                    'user_id': user.id,
+                    'email': user.email,
+                    'roles': {
+                        'id': user.roles.id,
+                        'name': user.roles.name
+                    }
                 }
             }
             return Response(response_data, status=status.HTTP_201_CREATED)

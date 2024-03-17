@@ -51,9 +51,7 @@ class AddCartItem(APIView):
         if existing_item:
             # Update the quantity
             existing_item.quantity += 1
-            serializer = CartItemSerializer(data=existing_item)
-            if serializer.is_valid():
-                serializer.save()
+            existing_item.save()
         else:
             # Create a new CartItem
             product = Product.objects.get(pk=product_id)
@@ -64,8 +62,7 @@ class AddCartItem(APIView):
     
 class RemoveCartItem(APIView):
     def delete(self, request, pk):
-        user = request.user
-        cart_item = get_object_or_404(CartItem, pk=pk)
+        cart_item = CartItem.objects.get(pk=pk)
         cart_item.delete()
         return Response(status=204)
 
