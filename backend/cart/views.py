@@ -47,18 +47,18 @@ class AddCartItem(APIView):
         product_id=request.data.get('product')
         cart_id=request.data.get('cart')
         # Check if item already exists in cart
-        existing_item = CartItem.objects.filter(product=product_id).first()
+        existing_item = CartItem.objects.filter(product=product_id, cart=cart_id).first()
         if existing_item:
             # Update the quantity
             existing_item.quantity += 1
             existing_item.save()
+            return Response("Item updated successfuly", status=201)
         else:
             # Create a new CartItem
             product = Product.objects.get(pk=product_id)
             cart = Cart.objects.get(pk=cart_id)
             CartItem.objects.create(cart=cart, product=product, quantity=1)
-
-        return Response("Item addedd successfuly", status=204)
+            return Response("Item added successfuly", status=201)
     
 class RemoveCartItem(APIView):
     def delete(self, request, pk):
