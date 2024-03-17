@@ -4,11 +4,14 @@ import { actions as customerStore } from "../customer/data/customerReducer";
 import { actions as merchantStore } from "../merchant/data/merchantReducer";
 import { getStoreInfo } from "../merchant/actions/storeActions";
 import { createCart } from "../customer/actions/cartActions";
+import { getBaseUrl } from "../../utils";
 
 
 export const updateToken = async (authTokens: any) => {
     const refreshObject = authTokens.refresh;
-    const  response = await fetch('http://127.0.0.1:8000/user/token/refresh/', {
+
+    const url = getBaseUrl() + 'user/token/refresh/';
+    const  response = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -42,7 +45,9 @@ export const loginUser = async (e: any) => {
     try {
         e.preventDefault()
         const formData = new FormData(e.target)
-        const response = await fetch('http://127.0.0.1:8000/user/token/', {
+
+        const url = getBaseUrl() + 'user/token/';
+        const response = await fetch(url, {
             method: 'POST',
             body: formData,
         })
@@ -96,7 +101,8 @@ export const logoutUser = async (type: string) => {
 
 export const fetchUserRoles = async () => {
     try {
-        let response = await fetch('http://127.0.0.1:8000/user/roles/')
+        const url = getBaseUrl() + 'user/roles/';
+        let response = await fetch(url)
         let data = await response.json()
         console.log("Fetch the available roles and store them in the local storage")
         localStorage.setItem('roles', JSON.stringify(data))
@@ -110,7 +116,8 @@ export const registerUser = async (e: any) => {
     try {
         e.preventDefault()
         const formData = new FormData(e.target)
-        let response = await fetch('http://127.0.0.1:8000/user/register/', {
+        const url = getBaseUrl() + 'user/register/';
+        let response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

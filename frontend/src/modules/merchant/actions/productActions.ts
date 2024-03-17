@@ -2,14 +2,16 @@ import { store } from "../../../redux";
 import { actions as merchanStore } from "../data/merchantReducer";
 import { MERCHANT_STORE_NAME } from "../../../redux/constants";
 import { createClient } from '@supabase/supabase-js'
-import { randomId } from "../../../utils";
+import { getBaseUrl, randomId } from "../../../utils";
 
 export const fetchStoreProducts = async () => {
     try {
         const merchantInfo = store.getState()[MERCHANT_STORE_NAME].merchantInfo ?? (localStorage.getItem('merchantInfo') && JSON.parse(localStorage.getItem('merchantInfo') ?? '')) ;
 
         const createdBy = merchantInfo?.user_id ?? process.env.REACT_APP_MERCHANT_ID ?? ''
-        const response = await fetch(`http://127.0.0.1:8000/product/store/list/?created_by=${createdBy}`);
+
+        const url = getBaseUrl() + `product/store/list/?created_by=${createdBy}`
+        const response = await fetch(url);
         const data = await response.json();
         store.dispatch(merchanStore.getStoreProducts(data));
     } catch (error) {
@@ -48,7 +50,9 @@ export const createProduct = async (e: any) => {
             created_by: merchantInfo.user_id,
             images: files,
         };
-        const response = await fetch(`http://127.0.0.1:8000/product/create/`, {
+
+        const url = getBaseUrl() + 'product/create/';
+        const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(product),
             headers: {
@@ -89,7 +93,8 @@ async function uploadFile(file: File) {
 }
 export const updateProduct = async (product: any) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/product/update/${product.id}`, {
+        const url = getBaseUrl() + `product/update/${product.id}`;
+        const response = await fetch(url, {
             method: 'PUT',
             body: JSON.stringify(product),
             headers: {
@@ -106,7 +111,8 @@ export const updateProduct = async (product: any) => {
 
 export const deleteProduct = async (productId: number)  => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/product/delete/${productId}/`, {
+        const url = getBaseUrl() + `product/delete/${productId}`;
+        const response = await fetch(url, {
             method: 'DELETE',
         });
         store.dispatch(merchanStore.deleteProdut(productId));

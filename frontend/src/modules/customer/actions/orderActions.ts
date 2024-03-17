@@ -1,11 +1,12 @@
 import { store } from "../../../redux";
 import { CUSTOMER_STORE_NAME } from "../../../redux/constants";
+import { getBaseUrl } from "../../../utils";
 import { actions as customerStore } from "../data/customerReducer";
 
 export const createOrder = async (order: any) => {
     try {
-        console.log(order)
-        const response = await fetch('http://0.0.0.0:8000/order/create/', {
+        const url = getBaseUrl() + 'order/create/';
+        const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(order),
             headers: {
@@ -21,10 +22,12 @@ export const createOrder = async (order: any) => {
 
 export const fetchCustomerOrders = async () => {
     try {
+
         const authTokens = JSON.parse(localStorage.getItem('authTokens') ?? "");
         const customerId = authTokens?.customer?.user_id ?? store.getState()[CUSTOMER_STORE_NAME].customer.user_id ??  '';
 
-        const response = await fetch(`http://127.0.0.1:8000/order/customer/list/?customer=${customerId}`);
+        const url = getBaseUrl() + `order/customer/list/?customer=${customerId}`
+        const response = await fetch(url);
         const data = await response.json();
         store.dispatch(customerStore.getCustomerOrders(data));
 

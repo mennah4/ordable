@@ -1,11 +1,13 @@
 import { store } from "../../../redux";
 import { CUSTOMER_STORE_NAME } from "../../../redux/constants";
+import { getBaseUrl } from "../../../utils";
 import { actions as customerStore } from "../data/customerReducer";
 
 export const createCart = async(reqData: any) => {
     try {     
+        const url = getBaseUrl() + 'cart/create/'
 
-         const response = await fetch('http://0.0.0.0:8000/cart/create/', {
+         const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify({
                 "store_id": process.env.REACT_APP_STORE_ID,
@@ -25,11 +27,13 @@ export const createCart = async(reqData: any) => {
 
 export const getCustomerCart = async () => {
     try {
+        
         const authTokens = JSON.parse(localStorage.getItem('authTokens') ?? "");
         const customerId = authTokens?.customer?.user_id ?? store.getState()[CUSTOMER_STORE_NAME].customer.user_id ??  '';
 
         if(customerId) {
-            const response = await fetch(`http://127.0.0.1:8000/cart/get/?customer_id=${customerId}`);
+            const url = getBaseUrl() + `cart/get/?customer_id=${customerId}`
+            const response = await fetch(url);
             let data;
             if(response.status !== 200) {
                 // await createCart();
@@ -55,8 +59,8 @@ export const addToCart = async (productId: string, quantity: number) => {
             "product": productId,
             "quantity": quantity ?? 1
         }
-
-        const response = await fetch(`http://127.0.0.1:8000/cart/add/`, {
+        const url = 'https://ordable-1.onrender.com/' + 'cart/add/'
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -74,7 +78,8 @@ export const addToCart = async (productId: string, quantity: number) => {
 
 export const removeFromCart = async (itemId: number) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/cart/delete/${itemId}/`, {
+        const url = getBaseUrl() + `cart/delete/${itemId}/`
+        const response = await fetch(url, {
             method: 'DELETE',
         });
         getCustomerCart()
